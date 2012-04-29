@@ -18,7 +18,8 @@ class MarkupCloud
     nil
   end
 
-  def local_markup(pattern, &block)
+  def local_markup(pattern, file = nil, &block)
+    require file if file
     markups[compile_pattern(pattern)] = block
   end
 

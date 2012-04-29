@@ -17,4 +17,13 @@ class MarkupCloudServerTest < Test::Unit::TestCase
 
     assert_equal 'sup?', @cloud.render('serious.q', 'sup')
   end
+
+  def test_local_markup_with_dependency
+    path = File.expand_path "../test_markup", __FILE__
+    @cloud.local_markup :ex, path do |content|
+      MarkupCloudTestRenderer.render(content)
+    end
+
+    assert_equal 'wat!', @cloud.render('zomg.ex', 'wat')
+  end
 end
