@@ -1,6 +1,7 @@
 class MarkupCloud
-  def initialize(markups = nil)
-    @markups = markups
+  def initialize
+    @markups = {}
+    @remote_markups = {}
   end
 
   def render(filename, content)
@@ -13,11 +14,12 @@ class MarkupCloud
 
   def local_markup(pattern, file = nil, &block)
     require file if file
-    markups[compile_pattern(pattern)] = block
+    @markups[compile_pattern(pattern)] = block
   end
 
   def remote_markup(pattern, address)
-    markups[compile_pattern(pattern)] = RemoteMarkup.new(address)
+    remote = @remote_markups[address] ||= RemoteMarkup.new(address)
+    @markups[compile_pattern(pattern)] = remote
   end
 
   def renderable?(filename)
@@ -25,14 +27,10 @@ class MarkupCloud
   end
 
   def renderer_for(filename)
-    markups.each do |pattern, endpoint|
+    @markups.each do |pattern, endpoint|
       return endpoint if filename =~ pattern
     end
     nil
-  end
-
-  def markups
-    @markups ||= {}
   end
 
   def compile_pattern(pattern)
