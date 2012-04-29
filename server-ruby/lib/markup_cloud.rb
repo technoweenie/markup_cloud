@@ -20,6 +20,10 @@ class MarkupCloud
     nil
   end
 
+  def local_markup(pattern, &block)
+    markups[pattern] = block
+  end
+
   def markups
     @markups ||= {}
   end
