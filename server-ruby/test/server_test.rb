@@ -14,20 +14,45 @@ class MarkupCloudServerTest < Test::Unit::TestCase
   end
 
   def test_remote_markup
-    addr = 'inproc://remote-markup'
+    addr = 'inproc://remote'
 
     rep = @context.socket ZMQ::REP
     rep.bind addr
     @cloud.remote_markup :zmq, addr
 
     Thread.new do
-      rep.recv_string msg = ''
-      assert_equal 'abc', msg
+      rep.recv_strings list = []
+      assert_equal %w(markup abc), list
       rep.send_string 'zmq'
       rep.close
     end
 
     assert_equal 'zmq', @cloud.render('foo.zmq', 'abc')
+  end
+
+  def test_multiple_remote_markups
+    addr = 'inproc://multiple-remote'
+
+    rep = @context.socket ZMQ::REP
+    rep.bind addr
+    answers = {'a' => 'a1', 'b' => 'b2'}
+
+    @cloud.remote_markup :a, addr, :a
+    @cloud.remote_markup :b, addr, :b
+
+    Thread.new do
+      2.times do
+        rep.recv_strings list = []
+        name, content = list
+        assert result = answers.delete(name)
+        assert_equal 'abc', content
+        rep.send_string result
+      end
+      rep.close
+    end
+
+    assert_equal 'a1', @cloud.render('foo.a', 'abc')
+    assert_equal 'b2', @cloud.render('foo.b', 'abc')
   end
 
   def test_local_markup_without_dependency

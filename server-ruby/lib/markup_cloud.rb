@@ -17,13 +17,9 @@ class MarkupCloud
     @markups[compile_pattern(pattern)] = block
   end
 
-  def remote_markup(pattern, address)
+  def remote_markup(pattern, address, name = nil)
     remote = @remote_markups[address] ||= RemoteMarkup.new(address)
-    @markups[compile_pattern(pattern)] = remote
-  end
-
-  def renderable?(filename)
-    !! renderer_for(filename)
+    @markups[compile_pattern(pattern)] = remote.named(name || :markup)
   end
 
   def renderer_for(filename)
@@ -38,15 +34,30 @@ class MarkupCloud
   end
 
   class RemoteMarkup
+    class NamedMarkup
+      def initialize(remote, name)
+        @remote = remote
+        @name = name.to_s
+      end
+
+      def call(content)
+        @remote.call @name, content
+      end
+    end
+
     def initialize(address)
       @address = address
       reset
     end
 
-    def call(content)
-      @socket.send_string content
+    def call(name, content)
+      @socket.send_strings [name, content]
       @socket.recv_string html=''
       html.empty? ? content : html
+    end
+
+    def named(name)
+      NamedMarkup.new self, name
     end
 
     def reset
