@@ -72,6 +72,16 @@ class MarkupCloudServerTest < Test::Unit::TestCase
     assert_equal 'wat!', @cloud.render('zomg.ex', 'wat')
   end
 
+  def test_regex
+    @cloud.local_markup /re?st(\.txt)?/ do |content|
+      content + '!'
+    end
+
+    %w(.rst .rest .rst.txt .rest.txt).each do |ext|
+      assert_equal 'a!', @cloud.render("a#{ext}", 'a'), "extension: #{ext.inspect}"
+    end
+  end
+
   def thread
     @threads << Thread.new(&Proc.new)
   end
