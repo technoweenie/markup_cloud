@@ -13,18 +13,20 @@ class MarkupCloud
 
   def renderer_for(filename)
     markups.each do |pattern, endpoint|
-      if Regexp.compile("\\.(#{pattern})$") =~ filename
-        return endpoint
-      end
+      return endpoint if filename =~ pattern
     end
     nil
   end
 
   def local_markup(pattern, &block)
-    markups[pattern] = block
+    markups[compile_pattern(pattern)] = block
   end
 
   def markups
     @markups ||= {}
+  end
+
+  def compile_pattern(pattern)
+    Regexp.compile("\\.(#{pattern})$")
   end
 end
