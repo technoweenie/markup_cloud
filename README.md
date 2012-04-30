@@ -6,6 +6,9 @@ This is simply an experiment in breaking the [github/markup][] up into smaller
 pieces.  Formats without a good Ruby library are now accessed through remote
 ZeroMQ sockets instead of shelling out with new processes.
 
+This is considered alpha code until it's been pushed to a gem.  Anything can
+change!
+
 [github/markup]: https://github.com/github/markup
 
 ## USAGE
@@ -70,3 +73,4 @@ while True:
 
 * Write solid ZeroMQ Python/Perl servers for ReST, POD, etc.
 * Figure out if any of this is worth the hassle.
+
