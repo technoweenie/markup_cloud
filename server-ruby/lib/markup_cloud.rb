@@ -28,10 +28,12 @@ class MarkupCloud
   # lib     - Optional String name of a ruby library dependency.
   # &block  - The Block that is called with the content to render.
   #
-  # Returns the Block.
+  # Returns the Block, or false if the lib dependency is not met.
   def local_markup(pattern, lib = nil, &block)
     require lib if lib
     @markups[compile_pattern(pattern)] = block
+  rescue LoadError
+    false
   end
 
   # Public: Adds a remote renderer that sends to and receives the marked up

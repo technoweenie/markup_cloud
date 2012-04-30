@@ -18,7 +18,7 @@ class MarkupCloudServerTest < Test::Unit::TestCase
 
     rep = @context.socket ZMQ::REP
     rep.bind addr
-    @cloud.remote_markup :zmq, addr
+    named = @cloud.remote_markup :zmq, addr
 
     Thread.new do
       rep.recv_strings list = []
@@ -27,6 +27,7 @@ class MarkupCloudServerTest < Test::Unit::TestCase
       rep.close
     end
 
+    assert named
     assert_equal 'zmq', @cloud.render('foo.zmq', 'abc')
   end
 
@@ -55,20 +56,26 @@ class MarkupCloudServerTest < Test::Unit::TestCase
     assert_equal 'b2', @cloud.render('foo.b', 'abc')
   end
 
+  def test_local_markup_with_missing_dependency
+    assert !@cloud.local_markup(:q, 'a/b/c') { |c| c + ':(' }
+  end
+
   def test_local_markup_without_dependency
-    @cloud.local_markup :q do |content|
+    block = @cloud.local_markup :q do |content|
       content + '?'
     end
 
+    assert block
     assert_equal 'sup?', @cloud.render('serious.q', 'sup')
   end
 
   def test_local_markup_with_dependency
     path = File.expand_path "../test_markup", __FILE__
-    @cloud.local_markup :ex, path do |content|
+    block = @cloud.local_markup :ex, path do |content|
       MarkupCloudTestRenderer.render(content)
     end
 
+    assert block
     assert_equal 'wat!', @cloud.render('zomg.ex', 'wat')
   end
 
