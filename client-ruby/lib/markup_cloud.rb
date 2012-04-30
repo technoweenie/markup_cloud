@@ -30,7 +30,7 @@ class MarkupCloud
   #
   # Returns the Block, or false if the lib dependency is not met.
   def local_markup(pattern, lib = nil, &block)
-    require lib if lib
+    require lib.to_s if lib
     @markups[compile_pattern(pattern)] = block
   rescue LoadError
     false
