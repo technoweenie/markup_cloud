@@ -72,5 +72,6 @@ while True:
 ## TODO
 
 * Write solid ZeroMQ Python/Perl servers for ReST, POD, etc.
+* Add bulk ZeroMQ API for remote markups.
 * Figure out if any of this is worth the hassle.
 
